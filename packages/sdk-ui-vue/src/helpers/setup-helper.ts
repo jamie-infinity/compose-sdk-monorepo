@@ -6,12 +6,13 @@ import {
 } from '@sisense/sdk-ui-preact';
 import { h, isReactive, onBeforeUnmount, ref, type Slots, toRaw } from 'vue';
 
-import { isObject } from '../utils.js';
+// import { isObject } from '../utils.js';
 import {
   createCustomWidgetsContextConnector,
   createSisenseContextConnector,
   createThemeContextConnector,
 } from './context-connectors';
+import { cloneDeep } from 'lodash-es';
 
 export function createDefaultContextConnectors() {
   return [
@@ -25,21 +26,21 @@ export function getRawData<T>(data: T): T {
   return isReactive(data) ? toRaw(data) : data;
 }
 
-export function toDeepRaw<T>(data: T): T {
-  const rawData = getRawData<T>(data);
+// export function toDeepRaw<T>(data: T): T {
+//   const rawData = getRawData<T>(data);
 
-  for (const key in rawData) {
-    const value = rawData[key];
+//   for (const key in rawData) {
+//     const value = rawData[key];
 
-    if (!isObject(value) && !Array.isArray(value)) {
-      continue;
-    }
+//     if (!isObject(value) && !Array.isArray(value)) {
+//       continue;
+//     }
 
-    rawData[key] = toDeepRaw<typeof value>(value);
-  }
+//     rawData[key] = toDeepRaw<typeof value>(value);
+//   }
 
-  return rawData; // much better: structuredClone(rawData)
-}
+//   return rawData; // much better: structuredClone(rawData)
+// }
 
 /**
  * Renders a component without children.
@@ -62,7 +63,7 @@ export const setupHelper = <C extends AnyComponentFunction>(
 
   return () => {
     if (elementRef.value) {
-      componentAdapter.render(elementRef.value, toDeepRaw(props));
+      componentAdapter.render(elementRef.value, cloneDeep(props));
     }
 
     return h('div', { ref: elementRef, style: 'width: 100%; height: 100%' });
@@ -93,7 +94,7 @@ export const setupHelperWithChildren = <C extends AnyComponentFunction>(
     if (elementRef.value && childrenElementRef.value) {
       const children = createWrapperElement(childrenElementRef.value);
 
-      componentAdapter.render(elementRef.value, { ...toDeepRaw(props), children });
+      componentAdapter.render(elementRef.value, { ...cloneDeep(props), children });
     }
 
     return [
