@@ -7,6 +7,7 @@ import {
 import type { Component, DefineComponent } from 'vue';
 
 import { renderComponent } from '../helpers/dynamic-renderer';
+import { getSisenseContext } from '../providers';
 import { getCustomWidgetsContext } from '../providers/custom-widgets-provider';
 
 /** Re-export related types */
@@ -55,8 +56,9 @@ export const useCustomWidgets = () => {
       customWidgetType: string,
       customWidget: CustomWidgetComponent<Props>,
     ): void => {
+      const sisenseContext = getSisenseContext();
       const customWidgetPreactComponent: CustomWidgetComponentPreact<Props> = (props: Props) => {
-        const renderedComponent = renderComponent(customWidget, props);
+        const renderedComponent = renderComponent(customWidget, props, sisenseContext);
         return createWrapperElement(renderedComponent.element as HTMLDivElement, () =>
           renderedComponent.destroy(),
         );

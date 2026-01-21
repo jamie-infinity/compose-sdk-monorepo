@@ -1,5 +1,8 @@
 import { type App, createApp } from 'vue';
-import type { Component, DefineComponent } from 'vue';
+import type { Component, DefineComponent, Ref } from 'vue';
+
+import type { CustomSisenseContext } from '@sisense/sdk-ui-preact';
+import { sisenseContextKey } from '../providers';
 
 type AnyObject = Record<string, any>;
 
@@ -18,6 +21,7 @@ export interface RenderedComponent {
 export function renderComponent<Props extends AnyObject>(
   Component: Component<Props> | DefineComponent<Props>,
   props: Props,
+  context: Ref<CustomSisenseContext>,
 ): RenderedComponent {
   const container = document.createElement('div');
   container.style.width = '100%';
@@ -25,6 +29,7 @@ export function renderComponent<Props extends AnyObject>(
 
   // Create a new Vue app and mount it to the child element
   const app = createApp(Component, props);
+  app.provide(sisenseContextKey, context);
   app.mount(container);
 
   // Create destroy function
